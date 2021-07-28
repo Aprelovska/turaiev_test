@@ -22,6 +22,10 @@ enum TextId {
   profileScreenTitle,
 }
 
+extension LocalizationContext on BuildContext {
+  String getText(TextId id) => Localization.byContextAndId(context: this, id: id);
+}
+
 class Localization {
   static const fallbackLocation = Location.en;
 
@@ -46,7 +50,8 @@ class Localization {
     required BuildContext context,
     required TextId id,
   }) {
-    final location = context.read<Bloc>().state.location; // TODO somehow get localization
+    // final location = context.read<Bloc>().state.location; // TODO somehow get location
+    final location = Location.en;
     return byLocationAndId(
       location: location,
       id: id,
