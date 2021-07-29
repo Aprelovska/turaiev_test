@@ -7,74 +7,68 @@ class CustomButton extends TextButton {
     Key? key,
     required VoidCallback? onPressed,
     required Widget child,
-    ButtonStyle? style,
+    ButtonStyle style = const ButtonStyle(),
   }) :
       super(
         key: key,
         onPressed: onPressed,
         child: child,
-        style: style?.merge(TextButton.styleFrom(
-          backgroundColor: CustomColors.white,
-          textStyle: const CustomTextStyle(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w500,
-          ),
-          side: BorderSide(
-            color: CustomColors.grey,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(5.0)),
-          ),
-        )),
+        style: style.merge(defaultStyle),
       );
 
   CustomButton.cancel({
     Key? key,
     required VoidCallback? onPressed,
     required Widget child,
-    ButtonStyle? style,
+    ButtonStyle style = const ButtonStyle(),
   }) :
       super(
         key: key,
         onPressed: onPressed,
         child: child,
-        style: style?.merge(TextButton.styleFrom(
+        style: style.merge(CustomButton.styleFrom(
+          side: BorderSide.none,
           backgroundColor: CustomColors.backgroundGrey,
-          textStyle: const CustomTextStyle(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w500,
-          ),
-        )),
+        )).merge(defaultStyle),
       );
-      // super(
-      //   key: key,
-      //   onPressed: onPressed,
-      //   child: child,
-      //   style: style?.merge(TextButton.styleFrom(
-      //     textStyle: const CustomTextStyle(
-      //       fontSize: 14.0,
-      //       fontWeight: FontWeight.w500,
-      //     ),
-      //   )),
-      // );
+    
+  static final ButtonStyle defaultStyle = styleFrom(
+    primary: CustomColors.black,
+    backgroundColor: CustomColors.white,
+    textStyle: const CustomTextStyle(
+      fontSize: 14.0,
+      fontWeight: FontWeight.w500,
+    ),
+    side: const BorderSide(
+      color: CustomColors.grey,
+    ),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+    ),
+    alignment: Alignment.center,
+    padding: const EdgeInsets.symmetric(
+      horizontal: 16.0,
+      vertical: 8.0,
+    ),
+  );
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   final hm = TextButton.styleFrom(
-  //     side: BorderSide(
-        
-  //     ),
-  //   );
-  //   final style = enabled ? TextButton.styleFrom(
-  //     backgroundColor: CustomColors.white,
-  //   ) : TextButton.styleFrom(
-  //     backgroundColor: CustomColors.backgroundGrey,
-  //   );
-
-  //   return TextButton(
-  //     onPressed: onPressed,
-  //     child: child,
-  //     style: style,
-  //   );
-  // }
+  static ButtonStyle styleFrom({
+    Color? primary,
+    Color? backgroundColor,
+    CustomTextStyle? textStyle,
+    BorderSide? side,
+    OutlinedBorder? shape,
+    AlignmentGeometry? alignment,
+    EdgeInsetsGeometry? padding,
+  }) {
+    return TextButton.styleFrom(
+      primary: primary,
+      backgroundColor: backgroundColor,
+      textStyle: textStyle,
+      side: side,
+      shape: shape,
+      alignment: alignment,
+      padding: padding,
+    );
+  }
 }

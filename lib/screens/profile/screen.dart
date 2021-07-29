@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:turaiev_test/global/location/bloc.dart';
+import 'package:turaiev_test/global/location/util.dart';
 import 'package:turaiev_test/global/ui/colors.dart';
 import 'package:turaiev_test/global/ui/text_style.dart';
 import 'package:turaiev_test/global/ui/widgets/app_bar.dart';
 import 'package:turaiev_test/global/ui/widgets/button.dart';
 import 'package:turaiev_test/global/ui/widgets/divider.dart';
+import 'package:turaiev_test/global/ui/widgets/grid.dart';
+import 'package:turaiev_test/global/user/bloc.dart';
+import 'package:turaiev_test/resources/icons.dart';
 import 'package:turaiev_test/resources/localization.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -12,36 +19,70 @@ class ProfileScreen extends StatelessWidget {
   }) : super(key: key);
 
   static Page buildPage() {
-    return const MaterialPage(
-      child: const ProfileScreen(
-        key: ValueKey('ProfileScreen'),
+    return MaterialPage(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<UserBloc>(create: (context) => UserBloc())
+        ],
+        child: const ProfileScreen(
+          key: ValueKey('ProfileScreen'),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar.page(
-        title: context.getText(TextId.profileScreenTitle),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(12.0),
-        children: [
-          _buildHeader(context),
-          const CustomDivider.vertical(spacing: 12.0),
-          _buildContent(context),
-        ],
+    return BlocBuilder<LocationBloc, LocationState>(
+      builder: (context, locationState) => BlocBuilder<UserBloc, UserState>(
+        builder: (context, userState) => Scaffold(
+          appBar: CustomAppBar.page(
+            title: userState.name,
+          ),
+          body: ListView(
+            padding: const EdgeInsets.all(12.0),
+            children: [
+              _buildHeader(context, userState),
+              const CustomDivider.vertical(spaceBefore: 12.0),
+              _buildContent(context, userState),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: 3,
+            backgroundColor: CustomColors.backgroundGrey,
+            selectedItemColor: CustomColors.black,
+            unselectedItemColor: CustomColors.grey,
+            items: [
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(CustomIcons.home),
+                label: 'home',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(CustomIcons.smilingFace),
+                label: 'enjoy',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(CustomIcons.person),
+                label: 'profile',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(CustomIcons.settings),
+                label: 'settings',
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, UserState userState) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildProfileInfo(context),
+        _buildProfileInfo(context, userState),
+        const SizedBox(height: 12.0),
         Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +91,10 @@ class ProfileScreen extends StatelessWidget {
               flex: 1,
               child: CustomButton(
                 onPressed: () {},
-                child: Text('Settings'),
+                child: Text(context.getText(TextId.settings)),
+                style: CustomButton.styleFrom(
+                  padding: EdgeInsets.all(12.0),
+                ),
               ),
             ),
             const SizedBox(width: 12.0),
@@ -58,7 +102,10 @@ class ProfileScreen extends StatelessWidget {
               flex: 1,
               child: CustomButton.cancel(
                 onPressed: () {},
-                child: Text('Saved'),
+                child: Text(context.getText(TextId.saved)),
+                style: CustomButton.styleFrom(
+                  padding: EdgeInsets.all(12.0),
+                ),
               ),
             ),
           ],
@@ -67,33 +114,39 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileInfo(BuildContext context) {
+  Widget _buildProfileInfo(BuildContext context, UserState userState) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         CircleAvatar(
           backgroundColor: CustomColors.backgroundGrey,
-          foregroundImage: NetworkImage('url'),
+          foregroundImage: NetworkImage(userState.avatarUrl),
+          radius: 36.0,
         ),
         const SizedBox(height: 12.0),
-        Text('abc'),
+        Text(userState.name,
+          style: CustomTextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
         const SizedBox(height: 12.0),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildStat(context,
-              label: 'Followers',
-              value: 25
+              label: context.getText(TextId.followers),
+              value: userState.followers,
             ),
-            const SizedBox(height: 12.0),
+            const SizedBox(width: 12.0),
             _buildStat(context,
-              label: 'Likes',
-              value: 15
+              label: context.getText(TextId.likes),
+              value: userState.likes,
             ),
-            const SizedBox(height: 12.0),
+            const SizedBox(width: 12.0),
             _buildStat(context,
-              label: 'Following',
-              value: 50
+              label: context.getText(TextId.following),
+              value: userState.following,
             ),
           ],
         ),
@@ -118,7 +171,7 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 4.0),
         Text(label,
           style: CustomTextStyle(
-            color: CustomColors.grey,
+            color: CustomColors.lightGrey,
             fontSize: 12.0,
             fontWeight: FontWeight.w400
           ),
@@ -127,7 +180,60 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
-    return Text('content');
+  Widget _buildContent(BuildContext context, UserState userState) {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TabBar(
+            indicatorColor: CustomColors.black,
+            labelStyle: CustomTextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w400,
+            ),
+            labelColor: CustomColors.black,
+            unselectedLabelColor: CustomColors.lightGrey,
+            tabs: [
+              Container(
+                padding: EdgeInsets.all(12.0),
+                child: Text(context.getText(TextId.outfits)),
+              ),
+              Container(
+                padding: EdgeInsets.all(12.0),
+                child: Text(context.getText(TextId.publications)),
+              ),
+            ],
+          ),
+          _buildOutfits(context, userState),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOutfits(BuildContext context, UserState userState) {
+    return CustomGrid(
+      crossAxisCount: 3,
+      ratio: 1,
+      itemCount: userState.imgUrlList.length,
+      builder: (context, i, j) {
+        return Image.network(userState.imgUrlList[i * 3 + j],
+          fit: BoxFit.cover,
+        );
+      }
+    );
+  }
+
+  Widget _buildPublications(BuildContext context) {
+    return Center(
+      child: ElevatedButton(
+        child: Text('пасхалка'),
+        onPressed: () {
+          final bloc = context.read<LocationBloc>();
+          final newLocation = bloc.state.location == Location.en ? Location.ru : Location.en;
+          bloc.add(UpdateLocationEvent(location: newLocation));
+        },
+      ),
+    );
   }
 }

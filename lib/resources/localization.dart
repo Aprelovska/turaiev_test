@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:turaiev_test/global/location/bloc.dart';
+import 'package:turaiev_test/global/location/util.dart';
 import 'package:turaiev_test/global/log.dart';
-import 'package:turaiev_test/resources/locations/en.dart' as en;
-import 'package:turaiev_test/resources/locations/ru.dart' as ru;
-
-enum Location {
-  en,
-  ru,
-}
-
-extension on Location {
-  String get name {
-    switch(this) {
-      case Location.en: return 'EN';
-      case Location.ru: return 'RU';
-    }
-  }
-}
+import 'package:turaiev_test/resources/localizations/en.dart' as en;
+import 'package:turaiev_test/resources/localizations/ru.dart' as ru;
 
 enum TextId {
-  profileScreenTitle,
+  settings,
+  saved,
+  followers,
+  likes,
+  following,
+  outfits,
+  publications,
 }
 
 extension LocalizationContext on BuildContext {
@@ -27,7 +21,7 @@ extension LocalizationContext on BuildContext {
 }
 
 class Localization {
-  static const fallbackLocation = Location.en;
+  static const fallbackLocation = LocationUtil.defaultLocation;
 
   static const Map<Location, Map<TextId, String>> _localizations = {
     Location.en: en.localization,
@@ -50,8 +44,7 @@ class Localization {
     required BuildContext context,
     required TextId id,
   }) {
-    // final location = context.read<Bloc>().state.location; // TODO somehow get location
-    final location = Location.en;
+    final location = context.read<LocationBloc>().state.location;
     return byLocationAndId(
       location: location,
       id: id,
