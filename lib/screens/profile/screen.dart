@@ -43,34 +43,13 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.all(12.0),
             children: [
               _buildHeader(context, userState),
+
               const CustomDivider.vertical(spaceBefore: 12.0),
+
               _buildContent(context, userState),
             ],
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: 3,
-            backgroundColor: CustomColors.backgroundGrey,
-            selectedItemColor: CustomColors.black,
-            unselectedItemColor: CustomColors.grey,
-            items: [
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset(CustomIcons.home),
-                label: 'home',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset(CustomIcons.smilingFace),
-                label: 'enjoy',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset(CustomIcons.person),
-                label: 'profile',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset(CustomIcons.settings),
-                label: 'settings',
-              ),
-            ],
-          ),
+          bottomNavigationBar: _buildBottomNavigationBar(context),
         ),
       ),
     );
@@ -82,12 +61,14 @@ class ProfileScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildProfileInfo(context, userState),
+
         const SizedBox(height: 12.0),
+
         Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
+            Expanded( // TODO for
               flex: 1,
               child: CustomButton(
                 onPressed: () {},
@@ -97,7 +78,9 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             const SizedBox(width: 12.0),
+
             Expanded(
               flex: 1,
               child: CustomButton.cancel(
@@ -115,6 +98,12 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildProfileInfo(BuildContext context, UserState userState) {
+    final stats = {
+      TextId.followers: userState.followers,
+      TextId.likes: userState.likes,
+      TextId.following: userState.following,
+    };
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -123,32 +112,27 @@ class ProfileScreen extends StatelessWidget {
           foregroundImage: NetworkImage(userState.avatarUrl),
           radius: 36.0,
         ),
+
         const SizedBox(height: 12.0),
+
         Text(userState.name,
           style: CustomTextStyle(
             fontSize: 16.0,
             fontWeight: FontWeight.w400,
           ),
         ),
+
         const SizedBox(height: 12.0),
+
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildStat(context,
-              label: context.getText(TextId.followers),
-              value: userState.followers,
-            ),
-            const SizedBox(width: 12.0),
-            _buildStat(context,
-              label: context.getText(TextId.likes),
-              value: userState.likes,
-            ),
-            const SizedBox(width: 12.0),
-            _buildStat(context,
-              label: context.getText(TextId.following),
-              value: userState.following,
-            ),
-          ],
+            for (final entry in stats.entries)
+              _buildStat(context,
+                label: context.getText(entry.key),
+                value: entry.value,
+              ),
+          ].expand((w) => [w, const SizedBox(width: 12.0,)]).toList()..removeLast(),
         ),
       ],
     );
@@ -168,7 +152,9 @@ class ProfileScreen extends StatelessWidget {
             fontWeight: FontWeight.w700
           ),
         ),
+
         const SizedBox(height: 4.0),
+
         Text(label,
           style: CustomTextStyle(
             color: CustomColors.lightGrey,
@@ -199,13 +185,26 @@ class ProfileScreen extends StatelessWidget {
                 padding: EdgeInsets.all(12.0),
                 child: Text(context.getText(TextId.outfits)),
               ),
+
               Container(
                 padding: EdgeInsets.all(12.0),
                 child: Text(context.getText(TextId.publications)),
               ),
             ],
           ),
+
           _buildOutfits(context, userState),
+
+          const SizedBox(height: 12.0),
+
+          CustomButton(
+            child: Text('пасхалка'),
+            onPressed: () {
+              final bloc = context.read<LocationBloc>();
+              final newLocation = bloc.state.location == Location.en ? Location.ru : Location.en;
+              bloc.add(UpdateLocationEvent(location: newLocation));
+            },
+          ),
         ],
       ),
     );
@@ -224,16 +223,28 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPublications(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        child: Text('пасхалка'),
-        onPressed: () {
-          final bloc = context.read<LocationBloc>();
-          final newLocation = bloc.state.location == Location.en ? Location.ru : Location.en;
-          bloc.add(UpdateLocationEvent(location: newLocation));
-        },
-      ),
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    final navBarItems = {
+      'Home': CustomIcons.home,
+      'Smile': CustomIcons.smilingFace,
+      'Profile': CustomIcons.person,
+      'Settings': CustomIcons.settings,
+    };
+
+    return BottomNavigationBar(
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      currentIndex: 3,
+      backgroundColor: CustomColors.backgroundGrey,
+      selectedItemColor: CustomColors.black,
+      unselectedItemColor: CustomColors.grey,
+      items: [
+        for (final entry in navBarItems.entries)
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(entry.value),
+            label: entry.key,
+          ),
+      ],
     );
   }
 }
