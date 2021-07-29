@@ -24,6 +24,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^7.0.1
+  equatable: ^2.0.3
+  flutter_svg: ^0.22.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -48,28 +50,28 @@ flutter:
   fonts:
     - family: Ubuntu
       fonts:
-        - asset: fonts/Ubuntu/w300-normal.ttf
+        - asset: assets/fonts/Ubuntu/w300-normal.ttf
           style: normal
           weight: 300
-        - asset: fonts/Ubuntu/w300-italic.ttf
+        - asset: assets/fonts/Ubuntu/w300-italic.ttf
           style: italic
           weight: 300
-        - asset: fonts/Ubuntu/w400-normal.ttf
+        - asset: assets/fonts/Ubuntu/w400-normal.ttf
           style: normal
           weight: 400
-        - asset: fonts/Ubuntu/w400-italic.ttf
+        - asset: assets/fonts/Ubuntu/w400-italic.ttf
           style: italic
           weight: 400
-        - asset: fonts/Ubuntu/w500-normal.ttf
+        - asset: assets/fonts/Ubuntu/w500-normal.ttf
           style: normal
           weight: 500
-        - asset: fonts/Ubuntu/w500-italic.ttf
+        - asset: assets/fonts/Ubuntu/w500-italic.ttf
           style: italic
           weight: 500
-        - asset: fonts/Ubuntu/w700-normal.ttf
+        - asset: assets/fonts/Ubuntu/w700-normal.ttf
           style: normal
           weight: 700
-        - asset: fonts/Ubuntu/w700-italic.ttf
+        - asset: assets/fonts/Ubuntu/w700-italic.ttf
           style: italic
           weight: 700
 
